@@ -1,27 +1,33 @@
 # defaul lib
 import sys
 import pathlib
+import glob
 import os
+import datetime
 
 # open lib
 import pandas
 
 # custom lib
-root = str(pathlib.Path(__file__))
+root = str(pathlib.Path(__file__).parent.parent)
 sys.path.insert(0,str(root))
 import access
 
 
 # variable
-level = '3'
-schema_source = 
-schema_target = 
+schema_source = 'CRESTELBILLINGPRD623'
+schema_target = 'bss_billing'
 type_load = 'initial'
 
+# current timestamp
+current_timestamp = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M%S')
+
 # list of table from source
-table_level_list = pandas.read_csv(root+"\schema {schema}\data\\table_level_list.csv".format(schema=schema_target),delimiter="|")
-table_level_list = table_level_list.loc[table_level_list["LEVEL"] == 'LV '+level]
-table_level_list = table_level_list["table name"].values.tolist()
+table_level_list = pandas.read_csv(glob.glob(root+"\initial load script creator\data\*.csv".format(schema=schema_target))[0],delimiter="|")
+level_list = table_level_list.drop('table name',axis=1).drop_duplicates()
+level_list = level_list['LEVEL'].values.tolist()
+table_list = table_level_list.drop('LEVEL',axis=1).drop_duplicates()
+table_list = table_list['table name'].values.tolist()
 
 # Variable for loop
 if type_load == 'initial':
@@ -32,15 +38,15 @@ elif type_load == 'incremental':
     var_a = 'init'
     var_b = 'incremental_load'
     var_c = 'incre_load'
-sub_job_level = 'sub_job_1.'+level
 
 # loop for creating file
-for table in table_level_list:
-    table_source = str(table).upper()
-    table_target = table
-    # Specify the new file name and content
-    new_file_name = '{table}_{var_a}.py'.format(table=table,var_a=var_a)
-    new_file_content = '''# default lib
+for level in level_list:
+    for table in table_list:
+        table_source = str(table).upper()
+        table_target = table
+        # Specify the new file name and content
+        new_file_name = '{table}_{var_a}.py'.format(table=table,var_a=var_a)
+        new_file_content = '''# default lib
 import sys
 import pathlib
 import os
@@ -83,10 +89,12 @@ src_data = pandas.DataFrame(src_conn.execute(sqlalchemy.sql.text("""
     """)))
 src_data.columns = src_data.columns.str.lower()
 src_data.to_sql(name=str("{table_target}").lower(),con=trg_engine,schema="{schema_target}",if_exists='append', index=False)
-
 src_conn.close()'''.format(table_source=table_source,table_target=table_target,schema_source=schema_source,schema_target=schema_target)
-    # Construct the full path to the new file
-    new_file_path = os.path.join(root+'\schema {schema_target}\etl\{var_b}\\{schema_target} {var_c}\sub_job_1\{sub_job_level}'.format(schema_target=schema_target,var_b=var_b,var_c=var_c,sub_job_level=sub_job_level), new_file_name)
-    # Create the new file and write the content into it
-    with open(new_file_path, 'w') as new_file:
-        new_file.write(new_file_content)
+        # Construct the full path to the new file
+        path = root+"\initial load script creator\output\{schema_target} {current_timestamp}\{level}".format(schema_target=schema_target,level=level,current_timestamp=current_timestamp)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        new_file_path = os.path.join(path, new_file_name)
+        # Create the new file and write the content into it
+        with open(new_file_path, 'w') as new_file:
+            new_file.write(new_file_content)

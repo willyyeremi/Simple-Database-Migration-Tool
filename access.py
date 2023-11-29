@@ -1,8 +1,8 @@
 # source credential
 src_host='10.13.0.37'
 src_port='1521'
-src_user=
-src_pwd=
+src_user='CRESTELBILLINGPRD623'
+src_pwd='CRESTELBILLINGPRD623'
 src_db='ocspri'
 
 # path to oracle instantclient, if using oracle

@@ -9,27 +9,28 @@ import pandas
 import sqlalchemy
 
 # custom lib
-root = str(pathlib.Path(__file__))
+root = str(pathlib.Path(__file__).parent.parent)
+print(root)
 sys.path.insert(0,str(root))
 import access
 
 
 # credential
 product = 'postgres'
-user = 
-pwd = 
-host = 
-port = 
-db = 
+user = access.trg_user
+pwd = access.trg_pwd
+host = access.trg_host
+port = access.trg_port
+db = access.trg_db
 schema = 'bss_voucher'
 
 # current timestamp
-current_timestamp = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%h%M%s')
+current_timestamp = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M%S')
 
 # function for each product
 # oracle
 def oracle_engine(user,pwd,host,port,db):
-    url = f"oracle+cx_oracle://{user}:{urllib.parse.quote_plus(pwd)}@{host}:{port}/?service_name={db}"
+    url = f"oracle+cx_oracle://{user}:{urllib.parse.quote_plus(pwd)}@{host}:{port}/?service_name={db}".format(user=user,pwd=pwd,host=host,port=port,db=db)
     engine = sqlalchemy.create_engine(url)
     conn = engine.connect()
     return (engine,conn)
@@ -135,4 +136,4 @@ while non_leveled.shape[0] > 0 and level_counter < 11:
         level = pandas.concat([level,new_data])
         non_leveled = pandas.DataFrame(columns=['table_name','LEVEL'])
 level = level.rename(columns={"table_name": "table name"})
-level.to_csv(path_or_buf=root+'\table_level\{schema} table level {current_timestamp}.csv'.format(schema=schema,current_timestamp=current_timestamp),sep='|',index=False)
+level.to_csv(path_or_buf=root+'\\table_level measure\output\{schema} table level {current_timestamp}.csv'.format(schema=schema,current_timestamp=current_timestamp),sep='|',index=False)
