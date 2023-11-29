@@ -1,4 +1,5 @@
 # default lib
+import datetime
 import pathlib
 import sys
 import urllib.parse
@@ -7,24 +8,28 @@ import urllib.parse
 import pandas
 import sqlalchemy
 
+# custom lib
+root = str(pathlib.Path(__file__))
+sys.path.insert(0,str(root))
+import access
+
 
 # credential
 product = 'postgres'
-user = 'DE'
-pwd = '6CkNDDvOYH1M9gus'
-host = 'datalake.balitower.co.id'
-port = '5432'
-db = 'ODS'
+user = 
+pwd = 
+host = 
+port = 
+db = 
 schema = 'bss_voucher'
 
-# root folder
-root = str(pathlib.Path(__file__).parent.parent)
-sys.path.insert(0,str(root))
+# current timestamp
+current_timestamp = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%h%M%s')
 
 # function for each product
 # oracle
 def oracle_engine(user,pwd,host,port,db):
-    url = f"oracle+cx_oracle://{{access.src_user_crestelbeprd623}}:{{urllib.parse.quote_plus(access.src_pwd_crestelbeprd623)}}@{{access.src_host}}:{{access.src_port}}/?service_name={{access.src_service}}"
+    url = f"oracle+cx_oracle://{user}:{urllib.parse.quote_plus(pwd)}@{host}:{port}/?service_name={db}"
     engine = sqlalchemy.create_engine(url)
     conn = engine.connect()
     return (engine,conn)
@@ -79,7 +84,7 @@ if product == 'postgres':
 # creating level 1 as base
 level_0 = pandas.merge(all_table,relation, on='table_name', how='left')
 level = level_0.loc[level_0['references'].isnull()].drop('references',axis=1)
-level['LEVEL'] = 'LV 1'
+level['LEVEL'] = '1'
 
 # detecting relation to self
 detector = level_0.dropna(subset='references').drop_duplicates(subset=['table_name','references'])
@@ -119,15 +124,15 @@ while non_leveled.shape[0] > 0 and level_counter < 11:
     level_x = level_x.reset_index()
     if 'X' in level_x.columns:
         new_data = level_x.loc[level_x['X'].isnull()].drop(['X','Y'],axis=1)
-        new_data['LEVEL'] = 'LV {}'.format(level_counter)
+        new_data['LEVEL'] = '{}'.format(level_counter)
         level = pandas.concat([level,new_data])
         not_defined_data = level_x[level_x['X'].notna()].drop(['X','Y'],axis=1)
         non_leveled = not_defined_data
         level_counter = level_counter + 1
     else:
         new_data = level_x.drop('Y',axis=1)
-        new_data['LEVEL'] = 'LV {}'.format(level_counter)
+        new_data['LEVEL'] = '{}'.format(level_counter)
         level = pandas.concat([level,new_data])
         non_leveled = pandas.DataFrame(columns=['table_name','LEVEL'])
 level = level.rename(columns={"table_name": "table name"})
-level.to_csv(path_or_buf=root+'\schema {schema}\data\\table_level_list.csv'.format(schema=schema),sep='|',index=False)
+level.to_csv(path_or_buf=root+'\table_level\{schema} table level {current_timestamp}.csv'.format(schema=schema,current_timestamp=current_timestamp),sep='|',index=False)

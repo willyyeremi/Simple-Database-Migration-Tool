@@ -6,15 +6,16 @@ import os
 # open lib
 import pandas
 
-
-# root directory
-root = str(pathlib.Path(__file__).parent.parent)
+# custom lib
+root = str(pathlib.Path(__file__))
 sys.path.insert(0,str(root))
+import access
+
 
 # variable
 level = '3'
-schema_source = 'CRESTELCAAMPRD623'
-schema_target = 'bss_caam'
+schema_source = 
+schema_target = 
 type_load = 'initial'
 
 # list of table from source
