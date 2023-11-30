@@ -1,2 +1,2 @@
-# Simple-Database-Migration-Tool
-Some tool for database migration
+# Simple Database Migration Tool
+Some tools for database migration built with Python.
