@@ -17,7 +17,6 @@ import access
 # variable
 schema_source = 'CRESTELBILLINGPRD623'
 schema_target = 'bss_billing'
-type_load = 'initial'
 
 # current timestamp
 current_timestamp = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M%S')
@@ -30,14 +29,9 @@ table_list = table_level_list.drop('LEVEL',axis=1).drop_duplicates()
 table_list = table_list['table name'].values.tolist()
 
 # Variable for loop
-if type_load == 'initial':
-    var_a = 'init'
-    var_b = 'initial_load'
-    var_c = 'init_load'
-elif type_load == 'incremental':
-    var_a = 'init'
-    var_b = 'incremental_load'
-    var_c = 'incre_load'
+var_a = 'init'
+var_b = 'initial_load'
+var_c = 'init_load'
 
 # loop for creating file
 for level in level_list:
