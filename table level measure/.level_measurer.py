@@ -222,7 +222,7 @@ if len(relation) != 0:
             non_leveled = pandas.DataFrame(columns=['table_name','LEVEL'])
     level = level.rename(columns={"table_name": "table name"})
 else:
-    level = relation
+    level = all_table
     level = level.rename(columns={"table_name": "table name"}).drop('references', axis=1)
     level['LEVEL'] = 'LV 1'
 
