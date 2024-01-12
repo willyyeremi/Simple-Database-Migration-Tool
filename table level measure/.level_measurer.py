@@ -68,9 +68,10 @@ class table_and_relation:
                 b.constraint_type = 'R'
             AND
             a.owner = '{schema}'""".format(schema=self.schema))))
-        relation['key']=relation['table_name']+relation['references']
-        relation = relation.drop_duplicates(subset=['key'])
-        relation = relation.drop('key', axis=1)
+        if len(relation) != 0:
+            relation['key']=relation['table_name']+relation['references']
+            relation = relation.drop_duplicates(subset=['key'])
+            relation = relation.drop('key', axis=1)
         all_table = pandas.DataFrame(conn.execute(sqlalchemy.sql.text("""
             SELECT 
                 table_name
@@ -106,9 +107,10 @@ class table_and_relation:
                 c.relname 
                 ,d.relname
             """.format(schema=self.schema))))
-        relation['key']=relation['table_name']+relation['references']
-        relation = relation.drop_duplicates(subset=['key'])
-        relation = relation.drop('key', axis=1)
+        if len(relation) != 0:
+            relation['key']=relation['table_name']+relation['references']
+            relation = relation.drop_duplicates(subset=['key'])
+            relation = relation.drop('key', axis=1)
         all_table = pandas.DataFrame(conn.execute(sqlalchemy.sql.text("""
             SELECT 
                 table_name
@@ -137,9 +139,10 @@ class table_and_relation:
                 AND
                 REFERENCED_TABLE_NAME IS NOT NULL;
             """.format(schema=self.schema))))
-        relation['key']=relation['table_name']+relation['references']
-        relation = relation.drop_duplicates(subset=['key'])
-        relation = relation.drop('key', axis=1)
+        if len(relation) != 0:
+            relation['key']=relation['table_name']+relation['references']
+            relation = relation.drop_duplicates(subset=['key'])
+            relation = relation.drop('key', axis=1)
         all_table = pandas.DataFrame(conn.execute(sqlalchemy.sql.text("""
             SELECT 
                 TABLE_NAME as table_name
