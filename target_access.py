@@ -1,5 +1,5 @@
 # target credential
-host = 's'
+host = ''
 port = ''
 user = ''
 pwd = ''
