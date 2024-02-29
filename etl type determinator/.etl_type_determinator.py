@@ -17,9 +17,9 @@ import target_access
 
 
 # credential
-product = 'oracle'
-source_or_target = 'source'
-schema = 'CRESTELBILLINGPRD623'
+product = ''
+source_or_target = ''
+schema = ''
 
 if source_or_target == 'source':
     envi = source_access.envi
