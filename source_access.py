@@ -1,5 +1,5 @@
 # source credential
-host = ''
+host = 'l'
 port = ''
 user = ''
 pwd = ''
