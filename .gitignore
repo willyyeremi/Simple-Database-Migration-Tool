@@ -163,3 +163,4 @@ cython_debug/
 # custom
 /source_access.py
 /target_access.py
+/connection_credential.py
