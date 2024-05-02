@@ -59,7 +59,25 @@ class connection:
 
 # ----- This is the beginning of the section where you can write credential -----
 
+source = connection(
+    'source'
+    ,'oracle'
+    ,'10.13.0.42'
+    ,'1521'
+    ,'CRESTELBILLINGPRD623'
+    ,'CRESTELBILLINGPRD623'
+    ,'ocspri'
+    ,'C:\oracle\instantclient_21_13')
 
+target = connection(
+    'target'
+    ,'postgresql'
+    ,'clstrdb.balitower.co.id'
+    ,'3306'
+    ,'afhive.pratama'
+    ,'y3ki5piH3_p!'
+    ,'intranet.balitower.co.id'
+    ,'')
 
 # ----- This is the end of the section where you can write credential -----
 
