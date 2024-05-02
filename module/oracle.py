@@ -6,6 +6,7 @@ from urllib.parse import quote_plus
 from pandas import DataFrame
 from sqlalchemy.sql import text
 
+
 def url(*,user:str,password:str,host:str,port:str,database:str) -> str:
     """
     Get connection url of sqlalchemy for Oracle database. 
@@ -48,9 +49,9 @@ def all_table(connection:object,schema:str) -> DataFrame:
         FROM 
             all_tables a
             left join
-            all_tab_columns b
+            all_tab_comments b
             on
-                a.owner = a.owner
+                a.owner = b.owner
                 and
                 a.table_name = b.table_name
         WHERE 
@@ -66,7 +67,7 @@ def column_rule(connection:object,schema:str) -> DataFrame:
     - table_name(string): name of all tables inside the schema 
     - column_id(string): the location of the column
     - column_name(string): name of the column
-    - nullable(boolean): nullability of the column. the value wheter True or False
+    - nullable(boolean): nullability of the column. the value wether True or False
     - data_type(string): data type of the column
     - column_comments(string): the column comment or description
     - default_data(string): the default value of the column
@@ -92,7 +93,7 @@ def column_rule(connection:object,schema:str) -> DataFrame:
             ,a.data_default as default_data
             ,a.data_length
             ,a.data_precision
-            
+            ,a.data_scale
         FROM
             all_tab_columns a
             left join
@@ -192,7 +193,7 @@ def check_constraint(connection:object,schema:str) -> DataFrame:
     - table_name(string): name of all tables inside the schema 
     - column_name(string): name of all columns that selected for check constraint
     - constraint_name(string): name of the check constraint
-    - searh_condition(string): the check constraint expression
+    - search_condition(string): the check constraint expression
 
     Args:
         - connection (object): sqlalchemy connection object

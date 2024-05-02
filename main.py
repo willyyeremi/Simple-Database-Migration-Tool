@@ -53,17 +53,20 @@ class runner:
     def __repr__(self) -> str:
         method_name = f"{self.product}"
         if hasattr(module, method_name):
-            method = getattr(module, method_name)
-            url = method.url(user=self.user,password=self.password,host=self.host,port=self.port,database=self.database)
             return f'runner(product={self.product},local_environment={self.local_environment},host={self.host},port={self.port},user={self.user},password={self.password},database={self.database},schema={self.schema})'
         else:
             print(f"Engine '{method_name}' not found.")
+    
+    def __eq__(self, other: self) -> bool:
+        return self.__dict__ == other.__dict__
 
-    def level_measure(self) -> pandas.DataFrame:
-        method_name = f"{self.product}"
+    def level_measure(self):
+        product = self.product
+        local_environment = self.local_environment
+        method_name = f"{product}"
         if hasattr(module, method_name):
             if self.local_environment != '':
-                os.environ["PATH"] = f"{self.local_environment};" + os.environ["PATH"]
+                os.environ["PATH"] = f"{local_environment};" + os.environ["PATH"]
             method = getattr(module, method_name)
             url = method.url(user=self.user,password=self.password,host=self.host,port=self.port,database=self.database)
             engine = sqlalchemy.create_engine(url)
@@ -73,7 +76,7 @@ class runner:
                 all_table = all_table.drop(['table_comments'], axis=1)
             relation = method.relation(conn,self.schema)
             if len(relation) != 0:
-                relation = relation.drop(['column_child', 'column_parent','constraint_name'], axis=1)
+                relation = relation.drop(['column_child', 'column_parent','constraint_name','on_update','on_delete'], axis=1)
                 relation = relation.rename(columns={"parent_table_name": "references"})
                 relation['key'] = relation['table_name'] + relation['references']
                 relation = relation.drop_duplicates(subset=['key'])
@@ -84,9 +87,12 @@ class runner:
             print(f"Engine '{method_name}' not found.")
 
 os.environ["PATH"] = f"{local_environment};" + os.environ["PATH"]
-url = module.oracle.url(user,password,host,port,database)
+url = module.oracle.url(user=user,password=password,host=host,port=port,database=database)
 engine = sqlalchemy.create_engine(url)
 conn = engine.connect()
 # check_constraint = pandas.DataFrame(conn.execute(sqlalchemy.sql.text(module.oracle.script_all_table(schema))))
-x = module.oracle.all_table(conn,schema)
-x.to_csv(path_or_buf=str(pathlib.Path(__file__).parent) + f'\\tes.csv',sep='|',index=False)
+# x = module.oracle.all_table(conn,schema)
+# x.to_csv(path_or_buf=str(pathlib.Path(__file__).parent) + f'\\tes.csv',sep='|',index=False)
+
+x = runner(product=product,user=user,password=password,host=host,port=port,database=database,local_environment=local_environment,schema=schema).level_measure()
+print(x)
