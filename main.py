@@ -44,7 +44,7 @@ class runner:
             method = getattr(module, method_name)
             url = method.url(user=self.user,password=self.password,host=self.host,port=self.port,database=self.database)
             if self.local_environment != '':
-                return f'product target:{self.product}, schema target: {self.schema},connection url: {url}'
+                return f'product target:{self.product}, schema target: {self.schema}, connection url: {url}'
             else:
                 return f'product target:{self.product}, local environment path: {self.local_environment}, schema target: {self.schema}, connection url: {url}'
         else:
@@ -57,7 +57,7 @@ class runner:
         else:
             print(f"Engine '{method_name}' not found.")
     
-    def __eq__(self, other: self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return self.__dict__ == other.__dict__
 
     def level_measure(self):
