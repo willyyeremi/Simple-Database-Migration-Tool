@@ -162,3 +162,4 @@ cython_debug/
 
 # custom
 module/__pycache__/
+/connection_credential.py
