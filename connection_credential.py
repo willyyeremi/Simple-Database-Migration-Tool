@@ -41,7 +41,7 @@ class connection:
         return f'product = {self.product}, local environment path = {self.local_environment} -> {self.user}:{self.password}@{self.host}:{self.port}'
 
     def __repr__(self) -> str:
-        return f'runner(name={self.name},product={self.product},host={self.host},port={self.port},user={self.user},password={self.password},database={self.database},local_environment={self.local_environment})'
+        return f'connection(name={self.name},product={self.product},host={self.host},port={self.port},user={self.user},password={self.password},database={self.database},local_environment={self.local_environment})'
 
     def __eq__(self, other: object) -> bool:
         return self.__dict__ == other.__dict__
