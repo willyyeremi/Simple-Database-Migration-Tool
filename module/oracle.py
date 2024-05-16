@@ -41,7 +41,7 @@ def all_table(connection:object,schema:str) -> DataFrame:
     Returns:
         DataFrame: dataframe containing desired metadata
     """
-    schema = schema
+    schema: str = schema
     script = f"""
         SELECT 
             a.table_name
@@ -58,7 +58,7 @@ def all_table(connection:object,schema:str) -> DataFrame:
             a.owner = '{schema}'
             and
             b.owner = '{schema}'"""
-    data = DataFrame(connection.execute(text(script)))
+    data: DataFrame = DataFrame(connection.execute(text(script)))
     return data
 
 def column_rule(connection:object,schema:str) -> DataFrame:
@@ -81,7 +81,7 @@ def column_rule(connection:object,schema:str) -> DataFrame:
     Returns:
         DataFrame: dataframe containing desired metadata
     """
-    schema = schema
+    schema: str = schema
     script = f"""
         SELECT 	
             a.table_name
@@ -108,7 +108,7 @@ def column_rule(connection:object,schema:str) -> DataFrame:
             a.owner = '{schema}'
             and
             b.owner = '{schema}'"""
-    data = DataFrame(connection.execute(text(script)))
+    data: DataFrame = DataFrame(connection.execute(text(script)))
     return data
 
 def primary_key(connection:object,schema:str) -> DataFrame:
@@ -125,7 +125,7 @@ def primary_key(connection:object,schema:str) -> DataFrame:
     Returns:
         DataFrame: dataframe containing desired metadata
     """
-    schema = schema
+    schema: str = schema
     script = f"""
         SELECT 
             a.table_name
@@ -145,7 +145,7 @@ def primary_key(connection:object,schema:str) -> DataFrame:
             a.constraint_type = 'P'
             and
             a.owner = '{schema}'"""
-    data = DataFrame(connection.execute(text(script)))
+    data: DataFrame = DataFrame(connection.execute(text(script)))
     return data
 
 def unique_constraint(connection:object,schema:str) -> DataFrame:
@@ -162,7 +162,7 @@ def unique_constraint(connection:object,schema:str) -> DataFrame:
     Returns:
         DataFrame: dataframe containing desired metadata
     """
-    schema = schema
+    schema: str = schema
     script = f"""
         SELECT 
             a.table_name
@@ -184,7 +184,7 @@ def unique_constraint(connection:object,schema:str) -> DataFrame:
             a.owner = '{schema}'
             and
             b.owner = '{schema}'"""
-    data = DataFrame(connection.execute(text(script)))
+    data: DataFrame = DataFrame(connection.execute(text(script)))
     return data
 
 def check_constraint(connection:object,schema:str) -> DataFrame:
@@ -202,7 +202,7 @@ def check_constraint(connection:object,schema:str) -> DataFrame:
     Returns:
         DataFrame: dataframe containing desired metadata
     """
-    schema = schema
+    schema: str = schema
     script = f"""
         select
             a.table_name
@@ -238,7 +238,7 @@ def check_constraint(connection:object,schema:str) -> DataFrame:
             and
             c.owner = '{schema}'
         """
-    data = DataFrame(connection.execute(text(script)))
+    data: DataFrame = DataFrame(connection.execute(text(script)))
     data['search_condition'] = data['search_condition'].replace("\s+", " ", regex=True).str.strip()
     data['search_condition'] = data['search_condition'].replace("\(\s", "(", regex=True)
     data['search_condition'] = data['search_condition'].replace("\s\)", ")", regex=True)
@@ -264,7 +264,7 @@ def relation(connection:object,schema:str) -> DataFrame:
     Returns:
         DataFrame: dataframe containing desired metadata
     """
-    schema = schema
+    schema: str = schema
     script = f"""
         SELECT
             a.table_name
@@ -312,7 +312,7 @@ def relation(connection:object,schema:str) -> DataFrame:
             c.owner = '{schema}'
             and
             d.owner = '{schema}'"""
-    data = DataFrame(connection.execute(text(script)))
+    data: DataFrame = DataFrame(connection.execute(text(script)))
     return data
 
 def unique_index(connection:object,schema:str) -> DataFrame:
@@ -327,7 +327,7 @@ def unique_index(connection:object,schema:str) -> DataFrame:
     Returns:
         DataFrame: dataframe containing desired metadata
     """
-    schema = schema
+    schema: str = schema
     script = f'''
         SELECT 
             all_indexes.table_name AS "table_name"
@@ -361,5 +361,5 @@ def unique_index(connection:object,schema:str) -> DataFrame:
             (ALL_CONSTRAINTS.CONSTRAINT_TYPE NOT IN ('P','U')
             OR 
             ALL_CONSTRAINTS.CONSTRAINT_TYPE IS NULL)'''
-    data = DataFrame(connection.execute(text(script)))
+    data: DataFrame = DataFrame(connection.execute(text(script)))
     raise NotImplementedError('Function still in development')

@@ -3,10 +3,10 @@ Main module to store all function that can be used to do all main purpose of thi
 - level_measure = to get all table relation hierarchy on a schema
 """
 
-from pandas import DataFrame
+import pandas
 
 
-def level_measure(all_table:DataFrame,relation:DataFrame) -> DataFrame:
+def level_measure(all_table:pandas.DataFrame,relation:pandas.DataFrame) -> pandas.DataFrame:
     """
     Get the hierarchy position of table from certain schema. The dataframe columns description are:
     - table_name (string): name of the tale
@@ -19,7 +19,6 @@ def level_measure(all_table:DataFrame,relation:DataFrame) -> DataFrame:
     Returns:
         DataFrame: data of table and its hierarchy position
     """    
-    import pandas
     if len(relation) != 0:
         # NOTE: level 1 (table without relation)
         table_with_relation = pandas.DataFrame(pandas.concat([relation['table_name'],relation['references']],ignore_index=True).drop_duplicates(),columns=['table name'])
