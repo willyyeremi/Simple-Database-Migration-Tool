@@ -10,6 +10,9 @@
 # you can set the variable name freely. just remember which is which when using it.
 
 class connection:
+    '''
+    Class object to create a connection object that can be accessed from another module
+    '''
     created_instances = {}
     rejected_instances = {}
 

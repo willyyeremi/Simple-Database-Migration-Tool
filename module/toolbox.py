@@ -6,7 +6,7 @@ Main module to store all function that can be used to do all main purpose of thi
 import pandas
 
 
-def level_measure(all_table:pandas.DataFrame,relation:pandas.DataFrame) -> pandas.DataFrame:
+def level_measure(all_table: pandas.DataFrame, relation: pandas.DataFrame) -> pandas.DataFrame:
     """
     Get the hierarchy position of table from certain schema. The dataframe columns description are:
     - table_name (string): name of the tale
