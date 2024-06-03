@@ -5,3 +5,4 @@ from . import mysql
 
 # for module
 from . import toolbox
+from . import connection

@@ -9,19 +9,19 @@ import sqlalchemy
 
 # custom lib
 import module
-import module.connection_credential as connection_credential
+import module.connection as connection
 
 # current timestamp
 current_timestamp:datetime = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M%S')
 
 # credential
-product: str = connection_credential.source.product
-host: str = connection_credential.source.host
-port: str = connection_credential.source.port
-user: str = connection_credential.source.user
-password: str = connection_credential.source.password
-database: str = connection_credential.source.database
-local_environment: str = connection_credential.source.local_environment
+product: str = connection.source.product
+host: str = connection.source.host
+port: str = connection.source.port
+user: str = connection.source.user
+password: str = connection.source.password
+database: str = connection.source.database
+local_environment: str = connection.source.local_environment
 
 # database schema
 schema = 'SYS'
