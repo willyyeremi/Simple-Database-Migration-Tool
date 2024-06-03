@@ -66,15 +66,17 @@ def credential_check(credential_data: DataFrame) -> None:
         if len(identical_credential) > 0:
             identical_credential_string: str = """"""
             for group in identical_credential:
+                step_count = 0
                 group_string: str = """- """
                 for name in group:
-                    group_string: str = group_string + name
-                    if name != group[-1]:
+                    group_string: str = f"""{group_string}{name}({step_count + 1})"""
+                    if step_count != len(group) - 1:
                         group_string: str = group_string + ", "
+                    step_count = step_count + 1
                 group_string: str = group_string + "\n"
                 identical_credential_string: str = identical_credential_string + group_string
             check_value: int = 0
-            check_string: str = f"there is duplicate credential. please choose one each group of duplicate.\n{identical_credential_string}"
+            check_string: str = f"""there is duplicate credential. please choose one each group of duplicate (the pattern is "connection name(row at csv)").\n{identical_credential_string}"""
         else:
             check_value: int = 1
             check_string: str = "there is no problem with credential.csv data."
