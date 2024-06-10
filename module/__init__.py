@@ -1,8 +1,6 @@
 # for subpackage
-from . import oracle
-from . import postgresql
-from . import mysql
+import product_module
 
 # for module
-from . import toolbox
-from . import connection
+import toolbox
+import connection

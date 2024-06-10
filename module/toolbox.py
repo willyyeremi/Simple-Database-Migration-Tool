@@ -3,8 +3,17 @@ Main module to store all function that can be used to do all main purpose of thi
 - level_measure = to get all table relation hierarchy on a schema
 """
 
+import importlib
+import os
+import inspect
+from sys import path
+from pathlib import Path
 import pandas
+import sqlalchemy
+import product_module
 
+root = str(Path(__file__).parent.parent)
+path.insert(0,str(root))
 
 def level_measure(all_table: pandas.DataFrame, relation: pandas.DataFrame) -> pandas.DataFrame:
     """
@@ -94,3 +103,29 @@ def level_measure(all_table: pandas.DataFrame, relation: pandas.DataFrame) -> pa
     level['level'] = pandas.to_numeric(level['level'])
     level = level.sort_values(by=['level', 'table_name'],ascending=[True, True])
     return level
+
+def runner(connection_dict: list[dict[str, str]], schema: str):
+    action_choose_dialogue = """1. Level measure
+2. DDL transfer
+
+What tool you want to use: """
+    action_choose: int = int(input(f"{action_choose_dialogue}"))
+    print("Avaible connection:")
+    for credential in connection_dict:
+        print(f"{connection_dict.index(credential) + 1}. credential {credential['name']}: product = {credential['product']}, local environment path = {credential['local_environment']} -> {credential['user']}:{credential['password']}@{credential['host']}:{credential['port']}")
+    if action_choose == 1:
+        target_choose_script: int = int(input("""Choose which connection you want to measure: """))
+        target_choose = connection_dict[target_choose_script - 1]
+        module_name = target_choose["product"]
+        module_list = [filename.rstrip('.py') for filename in os.listdir(f"{root}\module\product_module") if filename.endswith('.py') and filename != '__init__.py']
+        if module_name in module_list:
+            # print("YYY")
+            method = getattr(product_module, module_name)
+            url = method.url(host = {target_choose['host']}, port = {target_choose['port']}, user = {target_choose['user']}, password = {target_choose['password']})
+            engine = sqlalchemy.create_engine(url)
+            conn = engine.connect()
+            all_table = method.all_table(conn, schema)
+            print(all_table)
+    elif action_choose == 2:
+        raise NotImplementedError
+    

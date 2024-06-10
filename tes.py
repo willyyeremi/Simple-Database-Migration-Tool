@@ -27,4 +27,4 @@ product: str = source.product
 # database schema
 schema = 'SYS'
 
-print(product)
+module.toolbox.runner(credential_dict,schema)
