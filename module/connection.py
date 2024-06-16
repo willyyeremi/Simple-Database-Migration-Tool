@@ -13,6 +13,15 @@ path.insert(0,str(root))
 class connection:
     '''
     Class object to create a connection object that can be accessed from another module
+    
+    Args:
+        - product (string): the database product name (example: postgresql, mysql) in lowercase
+        - host (string): the database host address
+        - port (string): the database port access
+        - user (string): the username to access the database
+        - password (string): the password to access the database
+        - database (string): the name of the database
+        - local_environment (string): directory path to the local client program (example: local client program of oracle database)
     '''
 
     def __init__(self, product: str, host: str, port: str, user: str, password: str, database: str, local_environment: str) -> None:
@@ -59,7 +68,7 @@ def credential_check(credential_data: DataFrame) -> None:
         check_value: int = 0
         check_string: str = "credential.csv is empty. please fill it first with valid credential."
     else:
-        credential_data['id']: Series = credential_data['host'] + credential_data['port'] + credential_data['user'] + credential_data['password'] + credential_data['database']
+        credential_data['id'] = credential_data['host'] + credential_data['port'] + credential_data['user'] + credential_data['password'] + credential_data['database']
         credential_data: DataFrame = credential_data.groupby('id')['name'].apply(list).reset_index()
         credential_data: list[dict[str, str]] = credential_data.to_dict('records')
         identical_credential: list[list[str]] = [item['name'] for item in credential_data if len(item['name']) > 1]
@@ -84,7 +93,6 @@ def credential_check(credential_data: DataFrame) -> None:
         raise Exception(check_string)
     else:
         print(check_string)
-        pass
 
 def main():
     credential_data, credential_dict  = credential_get()
