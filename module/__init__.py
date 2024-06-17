@@ -1,6 +1,6 @@
-# for subpackage
-import product_module
+# Importing top-level modules
+from .connection import *
+from .toolbox import *
 
-# for module
-import toolbox
-import connection
+# Importing the product_module
+from .product_module import *

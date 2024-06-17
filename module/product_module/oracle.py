@@ -7,7 +7,7 @@ from pandas import DataFrame
 from sqlalchemy.sql import text
 
 
-def url(*,user:str,password:str,host:str,port:str,database:str) -> str:
+def url(*, user: str, password: str, host: str, port: str, database: str) -> str:
     """
     Get connection url of sqlalchemy for Oracle database. 
 
@@ -19,14 +19,15 @@ def url(*,user:str,password:str,host:str,port:str,database:str) -> str:
         - database (string): database name
 
     Returns:
-        string: connection url of sqlalchemy for Oracle database 
+        url_string (string): connection url of sqlalchemy for Oracle database 
     """
     user = user
     password = password
     host = host
     port = port
     database = database
-    return f"oracle+cx_oracle://{user}:{quote_plus(password)}@{host}:{port}/?service_name={database}"
+    url_string: str = f"oracle+cx_oracle://{user}:{quote_plus(password)}@{host}:{port}/?service_name={database}"
+    return url_string
 
 def all_table(connection:object,schema:str) -> DataFrame:
     """
@@ -39,7 +40,7 @@ def all_table(connection:object,schema:str) -> DataFrame:
         - schema (string): name of the schema that the metadata want to get extracted
 
     Returns:
-        DataFrame: dataframe containing desired metadata
+        data (pandas DataFrame): dataframe containing desired metadata
     """
     schema: str = schema
     script = f"""

@@ -3,14 +3,12 @@ Main module to store all function that can be used to do all main purpose of thi
 - level_measure = to get all table relation hierarchy on a schema
 """
 
-import importlib
 import os
-import inspect
 from sys import path
 from pathlib import Path
 import pandas
 import sqlalchemy
-import product_module
+from .product_module import *
 
 root = str(Path(__file__).parent.parent)
 path.insert(0,str(root))
@@ -119,7 +117,6 @@ What tool you want to use: """
         module_name = target_choose["product"]
         module_list = [filename.rstrip('.py') for filename in os.listdir(f"{root}\module\product_module") if filename.endswith('.py') and filename != '__init__.py']
         if module_name in module_list:
-            # print("YYY")
             method = getattr(product_module, module_name)
             url = method.url(host = {target_choose['host']}, port = {target_choose['port']}, user = {target_choose['user']}, password = {target_choose['password']})
             engine = sqlalchemy.create_engine(url)

@@ -1,3 +1,3 @@
-from . import mysql
-from . import oracle
-from . import postgresql
+from .mysql import *
+from .oracle import *
+from .postgresql import *
