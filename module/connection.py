@@ -96,7 +96,7 @@ def credential_check(credential_data: DataFrame) -> None:
 def credential_object_maker(credential_dict: dict[str: str]):
     for credential in credential_dict:
         globals()[credential['name']] = connection(credential['product'], credential['host'], credential['port'], credential['user'], credential['password'], credential['database'], credential['local_environment'])
-        print(f"credential {credential['name']}: {str(globals()[credential['name']])}")
+        # print(f"credential {credential['name']}: {str(globals()[credential['name']])}")
 
 def main():
     credential_data, credential_dict  = credential_get()

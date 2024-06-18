@@ -29,11 +29,11 @@ def url(*, user: str, password: str, host: str, port: str, database: str) -> str
     url_string: str = f"oracle+cx_oracle://{user}:{quote_plus(password)}@{host}:{port}/?service_name={database}"
     return url_string
 
-def all_table(connection:object,schema:str) -> DataFrame:
+def all_table(connection:object, schema:str) -> DataFrame:
     """
     Get all name of tables in a schema. The dataframe columns description are:
     - table_name(string): name of all tables inside the schema 
-    - table_comments(string): the table comment or description
+    - table_comment(string): the table comment or description
 
     Args:
         - connection (object): sqlalchemy connection object
@@ -46,7 +46,7 @@ def all_table(connection:object,schema:str) -> DataFrame:
     script = f"""
         SELECT 
             a.table_name
-            ,b.comments as table_comments
+            ,b.comments as table_comment
         FROM 
             all_tables a
             left join
