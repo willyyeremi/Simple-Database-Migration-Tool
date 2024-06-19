@@ -71,39 +71,61 @@ def all_table(connection:object, schema:str) -> DataFrame:
     data: DataFrame = DataFrame(connection.execute(text(script)))
     return data
 
-def primary_key(schema):
-    from pandas import DataFrame
-    schema = schema
+def primary_key(connection: object, schema: str) -> DataFrame:
+    """
+    Get all primary key in a schema. The dataframe columns description are:
+    - table_name(string): name of all tables inside the schema 
+    - column_name(string): name of all columns that selected as primary key
+    - constraint_name(string): name of the constraint that define the primary key
+
+    Args:
+        - connection (object): sqlalchemy connection object
+        - schema (string): name of the schema that the metadata want to get extracted
+
+    Returns:
+        data(pandas DataFrame): dataframe containing desired metadata
+    """
+    from sqlalchemy.sql import text
     script = f"""
-        SELECT
-            a.table_name as "table name"
-            ,c.column_name AS "column name"
-        FROM
-            information_schema.tables as a
-            left JOIN
-            information_schema.table_constraints as b
-            ON 
-                a.table_name = b.table_name 
-                AND 
-                a.table_schema = b.table_schema 
-                AND 
-                b.constraint_type = 'PRIMARY KEY'
-            left JOIN
-            information_schema.key_column_usage as c
-            ON 
-                a.table_name = c.table_name 
-                AND 
-                a.table_schema = c.table_schema 
-                AND 
-                b.constraint_name = c.constraint_name
+        with
+            data_1 as (
+                select
+                    s.nspname as "schema"
+                    ,cl.relname as table_name
+                    ,unnest (c.conkey) as column_name_id
+                    ,c.conname as constraint_name
+                from 
+                    pg_catalog.pg_constraint c
+                    left join
+                    pg_catalog.pg_class cl
+                    on
+                        c.conrelid = cl."oid"
+                    left join
+                    pg_catalog.pg_namespace s
+                    on
+                        c.connamespace = s."oid" 
+                where 
+                    c.contype = 'p'
+                    and
+                    s.nspname = '{schema}')
+        select 
+            data_1.table_name
+            ,cp.column_name 
+            ,data_1.constraint_name
+        from
+            data_1
+            left join
+            information_schema.columns cp
+            on
+                data_1."schema" = cp.table_schema 
+                and
+                data_1.table_name = cp.table_name 
+                and
+                data_1.column_name_id = cp.ordinal_position
         where
-            a.table_schema = '{schema}' 
-        ORDER BY
-            a.table_schema,
-            a.table_name,
-            c.ordinal_position"""
-    table_primary_key = table_primary_key.dropna(subset=['column name'])
-    return script
+            cp.table_schema = '{schema}'"""
+    data: DataFrame = DataFrame(connection.execute(text(script)))
+    return data
 
 def relation(connection: object, schema: str) -> DataFrame:
     """
