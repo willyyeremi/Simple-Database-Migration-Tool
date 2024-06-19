@@ -15,7 +15,7 @@ def url(user: str, password: str, host: str, port: str, database: str) -> str:
         url_string(string): connection url of sqlalchemy for Oracle database 
     """
     from urllib.parse import quote_plus
-    return f"mariadb+mariadbconnector://{user}:{password}@{host}:{port}]/{database}"
+    return f"mariadb+mariadbconnector://{user}:{password}@{host}:{port}/{database}"
 
 def all_table(connection:object, schema:str) -> DataFrame:
     """

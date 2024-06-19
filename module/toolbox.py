@@ -100,7 +100,7 @@ def level_measure(all_table: pandas.DataFrame, relation: pandas.DataFrame) -> pa
                 non_leveled = pandas.DataFrame(columns=['table_name','level'])
     else:
         level = all_table
-        level = level.drop('references', axis=1)
+        level = level.drop('table_comment', axis=1)
         level['level'] = '1'
     level['level'] = pandas.to_numeric(level['level'])
     level = level.sort_values(by=['level', 'table_name'], ascending=[True, True])
@@ -150,7 +150,7 @@ What tool you want to use: """
             new_path = root + '\\result\\level_measure'
             if not os.path.exists(new_path):
                 os.makedirs(new_path)
-            new_file_path = os.path.join(new_path, f'{connection_choose["host"]}{connection_choose["database"]} {schema} {current_timestamp}.csv')
+            new_file_path = os.path.join(new_path, f'{connection_choose["host"]} {connection_choose["database"]} {schema} {current_timestamp}.csv')
             if os.path.isfile(new_file_path):
                 os.remove(new_file_path)
             level_measure_result.to_csv(path_or_buf = new_file_path, sep = '|', index = False)
