@@ -1,6 +1,6 @@
 from pandas import DataFrame
 
-def url(user, password, host, port, database):
+def url(user: str, password: str, host: str, port: str, database: str) -> str:
     """
     Get connection url of sqlalchemy for Oracle database. 
 
@@ -181,7 +181,6 @@ def relation(connection: object, schema: str) -> DataFrame:
                 and
                 data_1.column_parent_id = cpn.ordinal_position 
         where 
-            ccn.table_schema = '{schema}'
-    """
+            ccn.table_schema = '{schema}'"""
     data: DataFrame = DataFrame(connection.execute(text(script)))
     return data

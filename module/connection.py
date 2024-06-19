@@ -53,6 +53,7 @@ def credential_get(credential_file_path: str =  f"{str(Path(__file__).parent.par
         credential_dict (list): result of transforming credential_data into a list of data per row (each row stored as dictionary)
     """
     credential_data: DataFrame = read_csv(filepath_or_buffer = credential_file_path, sep = "|", dtype = {"port": "object"})
+    credential_data: DataFrame = credential_data.fillna('')
     credential_dict: list[dict[str, str]] = credential_data.to_dict('records')
     return credential_data, credential_dict
 

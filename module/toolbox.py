@@ -110,20 +110,19 @@ def level_measure(all_table: pandas.DataFrame, relation: pandas.DataFrame) -> pa
 def runner(connection_dict: list[dict[str, str]]):
     from datetime import datetime
     current_timestamp: datetime = datetime.strftime(datetime.now(), '%Y%m%d_%H%M%S')
-    action_choose_dialogue = """Available tools:
+    action_choose_dialogue = """\nAvailable tools:
 1. Level measure
 2. DDL transfer
 
 What tool you want to use: """
     action_choose: int = int(input(f"{action_choose_dialogue}"))
     if action_choose == 1:
-        connection_choose_dialogue = "Available connection:"
+        connection_choose_dialogue = "\nAvailable connection:"
         for credential in connection_dict:
             connection_choose_dialogue = connection_choose_dialogue + f"\n{connection_dict.index(credential) + 1}. credential {credential['name']}: product = {credential['product']}, local environment path = {credential['local_environment']} -> {credential['user']}:{credential['password']}@{credential['host']}:{credential['port']}"
         connection_choose_dialogue = connection_choose_dialogue + "\n\nChoose which connection you want to measure: "
         connection_choose: int = int(input(connection_choose_dialogue))
         connection_choose = connection_dict[connection_choose - 1]
-        print(connection_choose)
         module_name = connection_choose["product"]
         module_path = f"module.product_module"
         product_module = import_module(module_path)
@@ -131,20 +130,22 @@ What tool you want to use: """
         url = method.url(user = connection_choose['user'], password = connection_choose['password'], host = connection_choose['host'], port = connection_choose['port'], database = connection_choose['database'])
         engine = sqlalchemy.create_engine(url)
         conn = engine.connect()
-        schema_list = method.all_schema(conn)
-        schema_choose_dialogue = "Available schema:"
-        for i, j in enumerate(schema_list, 1):
-            schema_choose_dialogue = schema_choose_dialogue + f"\n{i}. {j}"
-        schema_choose_dialogue = schema_choose_dialogue + "\n\nWhat schema you want to measure? "
-        schema_choose: int = int(input(schema_choose_dialogue))
-        schema = schema_list[schema_choose - 1]
+        if hasattr(method, 'all_schema'):
+            schema_list = method.all_schema(conn)
+            schema_choose_dialogue = "\nAvailable schema:"
+            for i, j in enumerate(schema_list, 1):
+                schema_choose_dialogue = schema_choose_dialogue + f"\n{i}. {j}"
+            schema_choose_dialogue = schema_choose_dialogue + "\n\nWhat schema you want to measure? "
+            schema_choose: int = int(input(schema_choose_dialogue))
+            schema = schema_list[schema_choose - 1]
+        else:
+            schema = connection_choose['database']
         all_table = method.all_table(conn, schema)
         relation = method.relation(conn, schema)
         level_measure_result = level_measure(all_table, relation)
-        print(level_measure_result)
-        save_result = input("Do you want to save the result?(y/n) ")
+        save_result = input("\nDo you want to save the result?(y/n) ")
         while save_result not in ['y', 'n']:
-            save_result = input("Please enter valid answer. Do you want to save the result?(y/n) ")
+            save_result = input("\nPlease enter valid answer. Do you want to save the result?(y/n) ")
         if save_result == 'y':
             new_path = root + '\\result\\level_measure'
             if not os.path.exists(new_path):
@@ -153,5 +154,6 @@ What tool you want to use: """
             if os.path.isfile(new_file_path):
                 os.remove(new_file_path)
             level_measure_result.to_csv(path_or_buf = new_file_path, sep = '|', index = False)
+        return level_measure_result
     elif action_choose == 2:
         raise NotImplementedError
