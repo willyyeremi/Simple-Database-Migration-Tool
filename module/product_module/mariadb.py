@@ -136,3 +136,42 @@ def relation(connection: object, schema: str) -> DataFrame:
             kcu.TABLE_SCHEMA = '{schema}'"""
     data: DataFrame = DataFrame(connection.execute(text(script)))
     return data
+
+def unique_constraint(connection: object, schema: str) -> DataFrame:
+    """
+    Get all primary key in a schema. The dataframe columns description are:
+    - table_name(string): name of all tables inside the schema 
+    - column_name(string): name of all columns that selected as primary key
+    - constraint_name(string): name of the unique constraint
+
+    Args:
+        - connection (object): sqlalchemy connection object
+        - schema (string): name of the schema that the metadata want to get extracted
+
+    Returns:
+        data(pandas DataFrame): dataframe containing desired metadata
+    """
+    from sqlalchemy.sql import text
+    script = f"""
+    SELECT 
+        c.table_name
+        ,cn.column_name
+        ,c.constraint_name 
+    from
+        information_schema.table_constraints c
+        left join
+        INFORMATION_SCHEMA.KEY_COLUMN_USAGE cn
+        on
+            c.CONSTRAINT_SCHEMA = cn.CONSTRAINT_SCHEMA 
+            and
+            c.TABLE_NAME  = cn.TABLE_NAME 
+            and
+            c.CONSTRAINT_NAME = cn.CONSTRAINT_NAME 
+    WHERE 
+        c.constraint_type = 'UNIQUE'
+        and
+        c.table_schema = '{schema}'
+        and
+        cn.TABLE_SCHEMA = '{schema}'"""
+    data: DataFrame = DataFrame(connection.execute(text(script)))
+    return data
