@@ -33,7 +33,7 @@ def smallint(product_target: str, metadata_dict: dict[str: str]) -> str:
     if product_target == 'mysql':
         target_script = f'smallint {number_type_attribute}'
     elif product_target == 'postgresql':
-        target_script = f'smallint'
+        target_script = f'int2'
     elif product_target == 'mariadb':
         target_script = f'smallint {number_type_attribute}'
     return target_script
@@ -53,7 +53,7 @@ def mediumint(product_target: str, metadata_dict: dict[str: str]) -> str:
     if product_target == 'mysql':
         target_script = f'mediumint {number_type_attribute}'
     elif product_target == 'postgresql':
-        target_script = f'integer'
+        target_script = f'int4'
     elif product_target == 'mariadb':
         target_script = f'mediumint {number_type_attribute}'
     return target_script
@@ -73,7 +73,7 @@ def int(product_target: str, metadata_dict: dict[str: str]) -> str:
     if product_target == 'mysql':
         target_script = f'int {number_type_attribute}'
     elif product_target == 'postgresql':
-        target_script = f'integer'
+        target_script = f'int4'
     elif product_target == 'mariadb':
         target_script = f'int {number_type_attribute}'
     return target_script
@@ -97,14 +97,14 @@ def bigint(product_target: str, metadata_dict: dict[str: str]) -> str:
         if product_target == 'mysql':
             target_script = f'bigint {number_type_attribute} auto_increment'
         elif product_target == 'postgresql':
-            target_script = f'bigserial'
+            target_script = f'serial8'
         elif product_target == 'mariadb':
             target_script = f'bigint {number_type_attribute} auto_increment'
     else:
         if product_target == 'mysql':
             target_script = f'bigint {number_type_attribute}'
         elif product_target == 'postgresql':
-            target_script = f'bigint'
+            target_script = f'int8'
         elif product_target == 'mariadb':
             target_script = f'bigint {number_type_attribute}'
     return target_script
@@ -123,7 +123,7 @@ def float(product_target: str, metadata_dict: dict[str: str]) -> str:
     if product_target == 'mysql':
         target_script = f'float'
     elif product_target == 'postgresql':
-        target_script = f'real'
+        target_script = f'float4'
     elif product_target == 'mariadb':
         target_script = f'float'
     return target_script
@@ -142,7 +142,7 @@ def double(product_target: str, metadata_dict: dict[str: str]) -> str:
     if product_target == 'mysql':
         target_script = f'double'
     elif product_target == 'postgresql':
-        target_script = f'double precision'
+        target_script = f'float8'
     elif product_target == 'mariadb':
         target_script = f'double'
     return target_script
@@ -322,6 +322,28 @@ def binary(product_target: str, metadata_dict: dict[str: str]) -> str:
         target_script = f'binary({char_max_size})'
     return target_script
 
+def varbinary(product_target: str, metadata_dict: dict[str: str]) -> str:
+    """
+    Transform varbinary data type from mysql
+    
+    Args:
+        - product_target(string): the product name of destination
+        - metadata_dict(dictionary): dictionary of column metadata
+    
+    Returns:
+        target_script(string): string for the column ddl
+    """
+    char_max_size = metadata_dict[char_max_size]
+    char_set = metadata_dict[char_set]
+    char_collation = metadata_dict[char_collation]
+    if product_target == 'mysql':
+        target_script = f'varbinary({char_max_size})'
+    elif product_target == 'postgresql':
+        target_script = f'bytea'
+    elif product_target == 'mariadb':
+        target_script = f'varbinary({char_max_size})'
+    return target_script
+
 def tinyblob(product_target: str, metadata_dict: dict[str: str]) -> str:
     """
     Transform tinyblob data type from mysql
@@ -401,3 +423,152 @@ def longblob(product_target: str, metadata_dict: dict[str: str]) -> str:
     elif product_target == 'mariadb':
         target_script = f'longblob'
     return target_script
+
+def year(product_target: str, metadata_dict: dict[str: str]) -> str:
+    """
+    Transform date data type from mysql
+    
+    Args:
+        - product_target(string): the product name of destination
+        - metadata_dict(dictionary): dictionary of column metadata
+    
+    Returns:
+        target_script(string): string for the column ddl
+    """
+    if product_target == 'mysql':
+        target_script = f'year'
+    elif product_target == 'postgresql':
+        target_script = f'int2'
+    elif product_target == 'mariadb':
+        target_script = f'year'
+    return target_script
+
+def date(product_target: str, metadata_dict: dict[str: str]) -> str:
+    """
+    Transform date data type from mysql
+    
+    Args:
+        - product_target(string): the product name of destination
+        - metadata_dict(dictionary): dictionary of column metadata
+    
+    Returns:
+        target_script(string): string for the column ddl
+    """
+    if product_target == 'mysql':
+        target_script = f'date'
+    elif product_target == 'postgresql':
+        target_script = f'date'
+    elif product_target == 'mariadb':
+        target_script = f'date'
+    return target_script
+
+def time(product_target: str, metadata_dict: dict[str: str]) -> str:
+    """
+    Transform date data type from mysql
+    
+    Args:
+        - product_target(string): the product name of destination
+        - metadata_dict(dictionary): dictionary of column metadata
+    
+    Returns:
+        target_script(string): string for the column ddl
+    """
+    time_precision = metadata_dict[time_precision]
+    if time_precision is not None:
+        time_precision = f'({time_precision})'
+    else:
+        time_precision = ''
+    if product_target == 'mysql':
+        target_script = f'time{time_precision}'
+    elif product_target == 'postgresql':
+        target_script = f'time{time_precision}'
+    elif product_target == 'mariadb':
+        target_script = f'time{time_precision}'
+    return target_script
+
+def datetime(product_target: str, metadata_dict: dict[str: str]) -> str:
+    """
+    Transform datetime data type from mysql
+    
+    Args:
+        - product_target(string): the product name of destination
+        - metadata_dict(dictionary): dictionary of column metadata
+    
+    Returns:
+        target_script(string): string for the column ddl
+    """
+    from re import match
+    time_precision = metadata_dict[time_precision]
+    extra = metadata_dict[extra]
+    if time_precision is not None:
+        time_precision = f'({time_precision})'
+    else:
+        time_precision = ''
+    if match(".*on update CURRENT_TIMESTAMP.*", extra):
+        extra = " on update CURRENT_TIMESTAMP"
+    else:
+        extra = ""
+    if product_target == 'mysql':
+        target_script = f'datetime{time_precision}{extra}'
+    elif product_target == 'postgresql':
+        target_script = f'timestamp{time_precision}'
+    elif product_target == 'mariadb':
+        target_script = f'datetime{time_precision}{extra}'
+    return target_script
+
+def timestamp(product_target: str, metadata_dict: dict[str: str]) -> str:
+    """
+    Transform timestamp data type from mysql
+    
+    Args:
+        - product_target(string): the product name of destination
+        - metadata_dict(dictionary): dictionary of column metadata
+    
+    Returns:
+        target_script(string): string for the column ddl
+    """
+    from re import match
+    time_precision = metadata_dict[time_precision]
+    extra = metadata_dict[extra]
+    if time_precision is not None:
+        time_precision = f'({time_precision})'
+    else:
+        time_precision = ''
+    if match(".*on update CURRENT_TIMESTAMP.*", extra):
+        extra = " on update CURRENT_TIMESTAMP"
+    else:
+        extra = ""
+    if product_target == 'mysql':
+        target_script = f'timestamp{time_precision}{extra}'
+    elif product_target == 'postgresql':
+        target_script = f'timestamp{time_precision}'
+    elif product_target == 'mariadb':
+        target_script = f'timestamp{time_precision}{extra}'
+    return target_script
+
+def json(product_target: str, metadata_dict: dict[str: str]) -> str:
+    """
+    Transform json data type from mysql
+    
+    Args:
+        - product_target(string): the product name of destination
+        - metadata_dict(dictionary): dictionary of column metadata
+    
+    Returns:
+        target_script(string): string for the column ddl
+    """
+    if product_target == 'mysql':
+        target_script = f'json'
+    elif product_target == 'postgresql':
+        raise Exception("json data type is not exists in postgresql")
+    elif product_target == 'mariadb':
+        target_script = f'json'
+    return target_script
+
+
+# NOTE: not implemented yet
+def enum(product_target: str, metadata_dict: dict[str: str]) -> str:
+    raise NotImplementedError
+
+def set(product_target: str, metadata_dict: dict[str: str]) -> str:
+    raise NotImplementedError
