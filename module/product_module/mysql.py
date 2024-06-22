@@ -60,26 +60,26 @@ def primary_key(connection: object, schema: str) -> DataFrame:
     """
     from sqlalchemy.sql import text
     script = f"""
-    SELECT 
-        c.table_name
-        ,cn.column_name
-        ,c.constraint_name 
-    from
-        information_schema.table_constraints c
-        left join
-        INFORMATION_SCHEMA.KEY_COLUMN_USAGE cn
-        on
-            c.CONSTRAINT_SCHEMA = cn.CONSTRAINT_SCHEMA 
+        SELECT 
+            c.table_name
+            ,cn.column_name
+            ,c.constraint_name 
+        from
+            information_schema.table_constraints c
+            left join
+            INFORMATION_SCHEMA.KEY_COLUMN_USAGE cn
+            on
+                c.CONSTRAINT_SCHEMA = cn.CONSTRAINT_SCHEMA 
+                and
+                c.TABLE_NAME  = cn.TABLE_NAME 
+                and
+                c.CONSTRAINT_NAME = cn.CONSTRAINT_NAME 
+        WHERE 
+            c.constraint_type = 'PRIMARY KEY'
             and
-            c.TABLE_NAME  = cn.TABLE_NAME 
+            c.table_schema = '{schema}'
             and
-            c.CONSTRAINT_NAME = cn.CONSTRAINT_NAME 
-    WHERE 
-        c.constraint_type = 'PRIMARY KEY'
-        and
-        c.table_schema = '{schema}'
-        and
-        cn.TABLE_SCHEMA = '{schema}'"""
+            cn.TABLE_SCHEMA = '{schema}'"""
     data: DataFrame = DataFrame(connection.execute(text(script)))
     return data
 
@@ -153,25 +153,25 @@ def unique_constraint(connection: object, schema: str) -> DataFrame:
     """
     from sqlalchemy.sql import text
     script = f"""
-    SELECT 
-        c.table_name
-        ,cn.column_name
-        ,c.constraint_name 
-    from
-        information_schema.table_constraints c
-        left join
-        INFORMATION_SCHEMA.KEY_COLUMN_USAGE cn
-        on
-            c.CONSTRAINT_SCHEMA = cn.CONSTRAINT_SCHEMA 
+        SELECT 
+            c.table_name
+            ,cn.column_name
+            ,c.constraint_name 
+        from
+            information_schema.table_constraints c
+            left join
+            INFORMATION_SCHEMA.KEY_COLUMN_USAGE cn
+            on
+                c.CONSTRAINT_SCHEMA = cn.CONSTRAINT_SCHEMA 
+                and
+                c.TABLE_NAME  = cn.TABLE_NAME 
+                and
+                c.CONSTRAINT_NAME = cn.CONSTRAINT_NAME 
+        WHERE 
+            c.constraint_type = 'UNIQUE'
             and
-            c.TABLE_NAME  = cn.TABLE_NAME 
+            c.table_schema = '{schema}'
             and
-            c.CONSTRAINT_NAME = cn.CONSTRAINT_NAME 
-    WHERE 
-        c.constraint_type = 'UNIQUE'
-        and
-        c.table_schema = '{schema}'
-        and
-        cn.TABLE_SCHEMA = '{schema}'"""
+            cn.TABLE_SCHEMA = '{schema}'"""
     data: DataFrame = DataFrame(connection.execute(text(script)))
     return data
