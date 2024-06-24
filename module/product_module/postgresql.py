@@ -1,5 +1,6 @@
 from pandas import DataFrame
 
+
 def url(user: str, password: str, host: str, port: str, database: str) -> str:
     """
     Get connection url of sqlalchemy for Oracle database. 
@@ -16,6 +17,28 @@ def url(user: str, password: str, host: str, port: str, database: str) -> str:
     """
     from urllib.parse import quote_plus
     return f"postgresql+psycopg2://{user}:{quote_plus(password)}@{host}:{port}/{database}"
+
+def version(connection: object):
+    """
+    Get the version of database. This will affect metadata table composition.
+    
+    Args:
+        connection(object): sqlalchemy connection object
+    
+    Returns:
+        data(string): the database engine version
+    """
+    from sqlalchemy.sql import text
+    script = f"""
+        SELECT 
+            setting AS semantic_version
+        FROM 
+            pg_catalog.pg_settings
+        WHERE 
+            name = 'server_version'"""
+    data: DataFrame = DataFrame(connection.execute(text(script)))
+    data: str = data.iloc[0, 0]
+    return data
 
 def all_schema(connection: object) -> list[str]:
     """
@@ -40,7 +63,7 @@ def all_schema(connection: object) -> list[str]:
     data: list[str] = data['schema_name'].values.tolist()
     return data
 
-def all_table(connection:object, schema:str) -> DataFrame:
+def all_table(connection: object, schema: str) -> DataFrame:
     """
     Get all name of tables in a schema. The dataframe columns description are:
     - table_name(string): name of all tables inside the schema 
@@ -79,8 +102,8 @@ def primary_key(connection: object, schema: str) -> DataFrame:
     - constraint_name(string): name of the constraint that define the primary key
 
     Args:
-        - connection (object): sqlalchemy connection object
-        - schema (string): name of the schema that the metadata want to get extracted
+        - connection(object): sqlalchemy connection object
+        - schema(string): name of the schema that the metadata want to get extracted
 
     Returns:
         data(pandas DataFrame): dataframe containing desired metadata

@@ -13,6 +13,34 @@ from importlib import import_module
 root = str(Path(__file__).parent.parent)
 path.insert(0,str(root))
 
+def database_version_value(version: str) -> dict[str: str]:
+    """
+    Get the major, minor, patch value from the version of the database
+    
+    Args:
+        version(string): the version value of the database
+    
+    Returns
+        semantic_version_dict(dict): dictionary that contain major, minor, and patch value
+    """
+    import re
+    pattern: str = r'^.*?(?=[\-\+])'
+    match = re.search(pattern, version)
+    if match:
+        match =  match.group(0)
+    else:
+        match = version
+    match = match.split(".")
+    semantic_version_part: list[str] = ["major", "minor", "patch"]
+    semantic_version_dict: dict[str: str] = {}
+    for i in range(0, len(match)):
+        semantic_version_dict[semantic_version_part[i]] = match[i]
+    if "minor" not in semantic_version_dict.keys():
+        semantic_version_dict["minor"] = "0"
+    if "patch" not in semantic_version_dict.keys():
+        semantic_version_dict["patch"] = "0"
+    return semantic_version_dict
+
 def level_measure(all_table: pandas.DataFrame, relation: pandas.DataFrame) -> pandas.DataFrame:
     """
     Get the hierarchy position of table from certain schema. The dataframe columns description are:
@@ -130,16 +158,13 @@ What tool you want to use: """
         url = method.url(user = connection_choose['user'], password = connection_choose['password'], host = connection_choose['host'], port = connection_choose['port'], database = connection_choose['database'])
         engine = sqlalchemy.create_engine(url)
         conn = engine.connect()
-        if hasattr(method, 'all_schema'):
-            schema_list = method.all_schema(conn)
-            schema_choose_dialogue = "\nAvailable schema:"
-            for i, j in enumerate(schema_list, 1):
-                schema_choose_dialogue = schema_choose_dialogue + f"\n{i}. {j}"
-            schema_choose_dialogue = schema_choose_dialogue + "\n\nWhat schema you want to measure? "
-            schema_choose: int = int(input(schema_choose_dialogue))
-            schema = schema_list[schema_choose - 1]
-        else:
-            schema = connection_choose['database']
+        schema_list = method.all_schema(conn)
+        schema_choose_dialogue = "\nAvailable schema:"
+        for i, j in enumerate(schema_list, 1):
+            schema_choose_dialogue = schema_choose_dialogue + f"\n{i}. {j}"
+        schema_choose_dialogue = schema_choose_dialogue + "\n\nWhat schema you want to measure? "
+        schema_choose: int = int(input(schema_choose_dialogue))
+        schema = schema_list[schema_choose - 1]
         all_table = method.all_table(conn, schema)
         relation = method.relation(conn, schema)
         level_measure_result = level_measure(all_table, relation)

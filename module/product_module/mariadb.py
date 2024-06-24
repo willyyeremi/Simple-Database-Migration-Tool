@@ -17,6 +17,49 @@ def url(user: str, password: str, host: str, port: str, database: str) -> str:
     from urllib.parse import quote_plus
     return f"mariadb+mariadbconnector://{user}:{password}@{host}:{port}/{database}"
 
+def version(connection: object):
+    """
+    Get the version of database. This will affect metadata table composition.
+    
+    Args:
+        connection(object): sqlalchemy connection object
+    
+    Returns:
+        data(string): the database engine version
+    """
+    from sqlalchemy.sql import text
+    script = f"""
+        SELECT 
+            version()"""
+    data: DataFrame = DataFrame(connection.execute(text(script)))
+    data: str = data.iloc[0, 0]
+    return data
+
+def all_schema(connection: object) -> list[str]:
+    """
+    Get all avaible schema on the database. The dataframe columns description are:
+    - schema_name(string): name of all schemas inside the database
+
+    Args:
+        - connection(object): sqlalchemy connection object
+
+    Returns:
+        data(list): list of schemas from database
+    """
+    from sqlalchemy.sql import text
+    script = f"""
+        SELECT 
+            schema_name
+        FROM 
+            information_schema.schemata
+        WHERE 
+            SCHEMA_NAME NOT IN ('information_schema', 'mariadb', 'performance_schema', 'sys')
+        ORDER BY 
+            schema_name"""
+    data: DataFrame = DataFrame(connection.execute(text(script)))
+    data: list[str] = data['schema_name'].values.tolist()
+    return data
+
 def all_table(connection:object, schema:str) -> DataFrame:
     """
     Get all name of tables in a schema. The dataframe columns description are:
