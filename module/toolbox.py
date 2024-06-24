@@ -135,6 +135,9 @@ def level_measure(all_table: pandas.DataFrame, relation: pandas.DataFrame) -> pa
     level = level.reset_index(drop = True)
     return level
 
+def ddl_transfer():
+    
+
 def runner(connection_dict: list[dict[str, str]]):
     from datetime import datetime
     current_timestamp: datetime = datetime.strftime(datetime.now(), '%Y%m%d_%H%M%S')
@@ -181,4 +184,41 @@ What tool you want to use: """
             level_measure_result.to_csv(path_or_buf = new_file_path, sep = '|', index = False)
         return level_measure_result
     elif action_choose == 2:
+        module_path = f"module.product_module"
+        product_module = import_module(module_path)
+        connection_choose_dialogue = "\nAvailable connection:"
+        for credential in connection_dict:
+            connection_choose_dialogue = connection_choose_dialogue + f"\n{connection_dict.index(credential) + 1}. credential {credential['name']}: product = {credential['product']}, local environment path = {credential['local_environment']} -> {credential['user']}:{credential['password']}@{credential['host']}:{credential['port']}"
+        print(connection_choose_dialogue)
+        source_connection_choose: int = int(input("\n\nChoose which one is the source connection: "))
+        source_connection_choose = connection_dict[source_connection_choose - 1]
+        source_module_name = source_connection_choose["product"]
+        source_method = getattr(product_module, source_module_name)
+        source_url = source_method.url(user = source_connection_choose['user'], password = source_connection_choose['password'], host = source_connection_choose['host'], port = source_connection_choose['port'], database = source_connection_choose['database'])
+        source_engine = sqlalchemy.create_engine(source_url)
+        source_conn = source_engine.connect()
+        source_schema_list = source_method.all_schema(source_conn)
+        source_schema_choose_dialogue = "\nAvailable schema on source:"
+        for i, j in enumerate(source_schema_list, 1):
+            source_schema_choose_dialogue = source_schema_choose_dialogue + f"\n{i}. {j}"
+        source_schema_choose_dialogue = source_schema_choose_dialogue + "\n\nWhat schema you want to transfer? "
+        source_schema_choose: int = int(input(source_schema_choose_dialogue))
+        source_schema = source_schema_list[source_schema_choose - 1]
+        for credential in connection_dict:
+            connection_choose_dialogue = connection_choose_dialogue + f"\n{connection_dict.index(credential) + 1}. credential {credential['name']}: product = {credential['product']}, local environment path = {credential['local_environment']} -> {credential['user']}:{credential['password']}@{credential['host']}:{credential['port']}"
+        print(connection_choose_dialogue)
+        target_connection_choose: int = int(input("\n\nChoose which one is the target connection: "))
+        target_connection_choose = connection_dict[target_connection_choose - 1]
+        target_module_name = target_connection_choose["product"]
+        target_method = getattr(product_module, target_module_name)
+        target_url = target_method.url(user = target_connection_choose['user'], password = target_connection_choose['password'], host = target_connection_choose['host'], port = target_connection_choose['port'], database = target_connection_choose['database'])
+        target_engine = sqlalchemy.create_engine(target_url)
+        target_conn = target_engine.connect()
+        target_schema_list = target_method.all_schema(target_conn)
+        target_schema_choose_dialogue = "\nAvailable schema on target:"
+        for i, j in enumerate(target_schema_list, 1):
+            target_schema_choose_dialogue = target_schema_choose_dialogue + f"\n{i}. {j}"
+        target_schema_choose_dialogue = target_schema_choose_dialogue + "\n\nWhat schema is the transfer destination? "
+        target_schema_choose: int = int(input(target_schema_choose_dialogue))
+        target_schema = target_schema_list[target_schema_choose - 1]
         raise NotImplementedError
