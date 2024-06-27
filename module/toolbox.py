@@ -135,10 +135,28 @@ def level_measure(all_table: pandas.DataFrame, relation: pandas.DataFrame) -> pa
     level = level.reset_index(drop = True)
     return level
 
-def ddl_transfer():
-    
+def ddl_transfer(source_product: str, source_connection: object, source_schema: str, target_product: str, target_connection: object, target_schema: str):
+    source_metadata_get_path: str = f"module.metadata_get"
+    source_metadata_get = import_module(source_metadata_get_path)
+    source_metadata_get_method = getattr(source_metadata_get, source_product)
+    all_table: pandas.DataFrame = source_metadata_get_method.all_table(source_connection, source_schema)
+    column_rule: pandas.DataFrame = source_metadata_get_method.column_rule(source_connection, source_schema)
+    primary_key: pandas.DataFrame = source_metadata_get_method.primary_key(source_connection, source_schema)
+    relation: pandas.DataFrame = source_metadata_get_method.relation(source_connection, source_schema)
+    unique_constraint: pandas.DataFrame = source_metadata_get_method.unique_constraint(source_connection, source_schema)
+    check_constraint: pandas.DataFrame = source_metadata_get_method.check_constraint(source_connection, source_schema)
+    all_index: pandas.DataFrame = source_metadata_get_method.all_index(source_connection, source_schema)
+    table_list: list[str] = all_table['table_name'].values.tolist()
+    for table in table_list:
+        table_column_rule: pandas.DataFrame = column_rule.loc[column_rule['table_name'] == table]
+        table_primary_key: pandas.DataFrame = primary_key.loc[primary_key['table_name'] == table]
+        table_relation: pandas.DataFrame = relation.loc[relation['table_name'] == table]
+        table_unique_constraint: pandas.DataFrame = unique_constraint.loc[unique_constraint['table_name'] == table]
+        table_check_constraint: pandas.DataFrame = check_constraint.loc[check_constraint['table_name'] == table]
+        table_all_index: pandas.DataFrame = all_index.loc[all_index['table_name'] == table]
+        
 
-def runner(connection_dict: list[dict[str, str]]):
+def main_runner(connection_dict: list[dict[str, str]]):
     from datetime import datetime
     current_timestamp: datetime = datetime.strftime(datetime.now(), '%Y%m%d_%H%M%S')
     action_choose_dialogue = """\nAvailable tools:
@@ -155,9 +173,9 @@ What tool you want to use: """
         connection_choose: int = int(input(connection_choose_dialogue))
         connection_choose = connection_dict[connection_choose - 1]
         module_name = connection_choose["product"]
-        module_path = f"module.product_module"
-        product_module = import_module(module_path)
-        method = getattr(product_module, module_name)
+        module_path = f"module.metadata_get"
+        metadata_get = import_module(module_path)
+        method = getattr(metadata_get, module_name)
         url = method.url(user = connection_choose['user'], password = connection_choose['password'], host = connection_choose['host'], port = connection_choose['port'], database = connection_choose['database'])
         engine = sqlalchemy.create_engine(url)
         conn = engine.connect()
@@ -184,8 +202,8 @@ What tool you want to use: """
             level_measure_result.to_csv(path_or_buf = new_file_path, sep = '|', index = False)
         return level_measure_result
     elif action_choose == 2:
-        module_path = f"module.product_module"
-        product_module = import_module(module_path)
+        module_path = f"module.metadata_get"
+        metadata_get = import_module(module_path)
         connection_choose_dialogue = "\nAvailable connection:"
         for credential in connection_dict:
             connection_choose_dialogue = connection_choose_dialogue + f"\n{connection_dict.index(credential) + 1}. credential {credential['name']}: product = {credential['product']}, local environment path = {credential['local_environment']} -> {credential['user']}:{credential['password']}@{credential['host']}:{credential['port']}"
@@ -193,7 +211,7 @@ What tool you want to use: """
         source_connection_choose: int = int(input("\n\nChoose which one is the source connection: "))
         source_connection_choose = connection_dict[source_connection_choose - 1]
         source_module_name = source_connection_choose["product"]
-        source_method = getattr(product_module, source_module_name)
+        source_method = getattr(metadata_get, source_module_name)
         source_url = source_method.url(user = source_connection_choose['user'], password = source_connection_choose['password'], host = source_connection_choose['host'], port = source_connection_choose['port'], database = source_connection_choose['database'])
         source_engine = sqlalchemy.create_engine(source_url)
         source_conn = source_engine.connect()
@@ -204,21 +222,25 @@ What tool you want to use: """
         source_schema_choose_dialogue = source_schema_choose_dialogue + "\n\nWhat schema you want to transfer? "
         source_schema_choose: int = int(input(source_schema_choose_dialogue))
         source_schema = source_schema_list[source_schema_choose - 1]
-        for credential in connection_dict:
-            connection_choose_dialogue = connection_choose_dialogue + f"\n{connection_dict.index(credential) + 1}. credential {credential['name']}: product = {credential['product']}, local environment path = {credential['local_environment']} -> {credential['user']}:{credential['password']}@{credential['host']}:{credential['port']}"
-        print(connection_choose_dialogue)
-        target_connection_choose: int = int(input("\n\nChoose which one is the target connection: "))
-        target_connection_choose = connection_dict[target_connection_choose - 1]
-        target_module_name = target_connection_choose["product"]
-        target_method = getattr(product_module, target_module_name)
-        target_url = target_method.url(user = target_connection_choose['user'], password = target_connection_choose['password'], host = target_connection_choose['host'], port = target_connection_choose['port'], database = target_connection_choose['database'])
-        target_engine = sqlalchemy.create_engine(target_url)
-        target_conn = target_engine.connect()
-        target_schema_list = target_method.all_schema(target_conn)
-        target_schema_choose_dialogue = "\nAvailable schema on target:"
-        for i, j in enumerate(target_schema_list, 1):
-            target_schema_choose_dialogue = target_schema_choose_dialogue + f"\n{i}. {j}"
-        target_schema_choose_dialogue = target_schema_choose_dialogue + "\n\nWhat schema is the transfer destination? "
-        target_schema_choose: int = int(input(target_schema_choose_dialogue))
-        target_schema = target_schema_list[target_schema_choose - 1]
-        raise NotImplementedError
+        x = source_method.column_rule(source_conn, source_schema)
+        x = x.to_dict('records')
+        print(x)
+        # connection_choose_dialogue = "\nAvailable connection:"
+        # for credential in connection_dict:
+        #     connection_choose_dialogue = connection_choose_dialogue + f"\n{connection_dict.index(credential) + 1}. credential {credential['name']}: product = {credential['product']}, local environment path = {credential['local_environment']} -> {credential['user']}:{credential['password']}@{credential['host']}:{credential['port']}"
+        # print(connection_choose_dialogue)
+        # target_connection_choose: int = int(input("\n\nChoose which one is the target connection: "))
+        # target_connection_choose = connection_dict[target_connection_choose - 1]
+        # target_module_name = target_connection_choose["product"]
+        # target_method = getattr(metadata_get, target_module_name)
+        # target_url = target_method.url(user = target_connection_choose['user'], password = target_connection_choose['password'], host = target_connection_choose['host'], port = target_connection_choose['port'], database = target_connection_choose['database'])
+        # target_engine = sqlalchemy.create_engine(target_url)
+        # target_conn = target_engine.connect()
+        # target_schema_list = target_method.all_schema(target_conn)
+        # target_schema_choose_dialogue = "\nAvailable schema on target:"
+        # for i, j in enumerate(target_schema_list, 1):
+        #     target_schema_choose_dialogue = target_schema_choose_dialogue + f"\n{i}. {j}"
+        # target_schema_choose_dialogue = target_schema_choose_dialogue + "\n\nWhat schema is the transfer destination? "
+        # target_schema_choose: int = int(input(target_schema_choose_dialogue))
+        # target_schema = target_schema_list[target_schema_choose - 1]
+        # raise NotImplementedError

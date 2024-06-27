@@ -93,19 +93,20 @@ def column_rule(connection:object, schema:str) -> DataFrame:
     - table_name(string): name of all tables inside the schema 
     - column_name(string): name of all columns that selected as primary key
     - ordinal_position(string): the position of column on table
-    - is_nullable(string): 'YES' if column can have null, 'NO' if can not
+    - is_nullable(string): 'NULL' if column can have null, 'NOT NULL' if can not
     - column_comment(string): column comment
     - default_value(string): the default value expression
     - data_type(string): the data type of the column
     - char_max_length(string): maximum length of string data type by total character
     - char_max_size(string): maximum length of string data type by total size
-    - char_set(string): character set name of string data type
-    - char_collation(string): collation name of string data typ
-    - number_type_attribute(string): 'signed' and 'unsigned' attribute for number data type
+    - char_set(string): character set of string data type
+    - char_collation(string): collation name of string data type
+    - integer_type_attribute(string): 'signed', 'unsigned', 'zerofill' attribute for number data type
     - numeric_precision(integer): precision for numeric data type
     - numeric_scale(integer): scale for numeric data type
     - datetime_precision(integer): total digit of fraction second of datetime or timestamp data type
-    - extra(string): other expression for the column that will be usefull
+    - generated_column_type(string): type of generated value column, whether 'stored' or 'virtual'
+    - extra(string): other expression for the column that will be useful
 
     Args:
         - connection(object): sqlalchemy connection object
@@ -137,23 +138,17 @@ def column_rule(connection:object, schema:str) -> DataFrame:
             ,CASE 
                 when
                     column_type like '%zerofill%'
-                    then 'zerofil'
+                    then 'zerofill'
                 when
                     column_type like '%unsigned%'
                     then 'unsigned'
                 else
                     'signed'
-            END as number_type_attribute
+            END as integer_type_attribute
             ,numeric_precision
             ,numeric_scale
             ,datetime_precision
             ,case
-                when
-                    extra like '%auto_increment%'
-                    then 'auto_increment'
-                when
-                    extra like '%on update CURRENT_TIMESTAMP%'
-                    then 'on update CURRENT_TIMESTAMP'
                 when 
                     extra like '%STORED%'
                     then 'stored'
@@ -161,12 +156,25 @@ def column_rule(connection:object, schema:str) -> DataFrame:
                     extra like '%VIRTUAL%'
                     then 'virtual'
                 else
-                    null
+                    ''
+            end as generated_column_type
+            ,case
+                when
+                    extra like '%auto_increment%'
+                    then 'auto_increment'
+                when
+                    extra like '%on update CURRENT_TIMESTAMP%'
+                    then 'on update CURRENT_TIMESTAMP'
+                else
+                    ''
             end as extra
         from
             information_schema.columns
         where
-            TABLE_SCHEMA = '{schema}'"""
+            TABLE_SCHEMA = '{schema}'
+        order by
+            table_name asc
+            ,ordinal_position asc"""
     data: DataFrame = DataFrame(connection.execute(text(script)))
     return data
 

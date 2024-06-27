@@ -9,13 +9,13 @@ def tinyint(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    number_type_attribute = metadata_dict[number_type_attribute]
+    integer_type_attribute = metadata_dict['integer_type_attribute']
     if product_target == 'mysql':
-        target_script = f'tinyint {number_type_attribute}'
+        target_script = f'tinyint {integer_type_attribute}'
     elif product_target == 'postgresql':
         target_script = f'smallint'
     elif product_target == 'mariadb':
-        target_script = f'tinyint {number_type_attribute}'
+        target_script = f'tinyint {integer_type_attribute}'
     return target_script
 
 def smallint(product_target: str, metadata_dict: dict[str: str]) -> str:
@@ -29,13 +29,13 @@ def smallint(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    number_type_attribute = metadata_dict[number_type_attribute]
+    integer_type_attribute = metadata_dict['integer_type_attribute']
     if product_target == 'mysql':
-        target_script = f'smallint {number_type_attribute}'
+        target_script = f'smallint {integer_type_attribute}'
     elif product_target == 'postgresql':
         target_script = f'int2'
     elif product_target == 'mariadb':
-        target_script = f'smallint {number_type_attribute}'
+        target_script = f'smallint {integer_type_attribute}'
     return target_script
 
 def mediumint(product_target: str, metadata_dict: dict[str: str]) -> str:
@@ -49,13 +49,13 @@ def mediumint(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    number_type_attribute = metadata_dict[number_type_attribute]
+    integer_type_attribute = metadata_dict['integer_type_attribute']
     if product_target == 'mysql':
-        target_script = f'mediumint {number_type_attribute}'
+        target_script = f'mediumint {integer_type_attribute}'
     elif product_target == 'postgresql':
         target_script = f'int4'
     elif product_target == 'mariadb':
-        target_script = f'mediumint {number_type_attribute}'
+        target_script = f'mediumint {integer_type_attribute}'
     return target_script
 
 def int(product_target: str, metadata_dict: dict[str: str]) -> str:
@@ -69,13 +69,13 @@ def int(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    number_type_attribute = metadata_dict[number_type_attribute]
+    integer_type_attribute = metadata_dict['integer_type_attribute']
     if product_target == 'mysql':
-        target_script = f'int {number_type_attribute}'
+        target_script = f'int {integer_type_attribute}'
     elif product_target == 'postgresql':
         target_script = f'int4'
     elif product_target == 'mariadb':
-        target_script = f'int {number_type_attribute}'
+        target_script = f'int {integer_type_attribute}'
     return target_script
 
 def bigint(product_target: str, metadata_dict: dict[str: str]) -> str:
@@ -90,23 +90,18 @@ def bigint(product_target: str, metadata_dict: dict[str: str]) -> str:
         target_script(string): string for the column ddl
     """
     from re import match
-    is_nullable = metadata_dict[is_nullable]
-    number_type_attribute = metadata_dict[number_type_attribute]
-    extra = metadata_dict[extra]
-    if is_nullable == 'NOT NULL' and match("unsigned.*", number_type_attribute) and match(".*auto_increment.*", extra):
-        if product_target == 'mysql':
-            target_script = f'bigint {number_type_attribute} auto_increment'
-        elif product_target == 'postgresql':
+    is_nullable = metadata_dict['is_nullable']
+    integer_type_attribute = metadata_dict['integer_type_attribute']
+    extra = metadata_dict['extra']
+    if product_target == 'mysql':
+        target_script = f'bigint'
+    elif product_target == 'postgresql':
+        if is_nullable == 'NOT NULL' and match("unsigned.*", integer_type_attribute) and match(".*auto_increment.*", extra):
             target_script = f'serial8'
-        elif product_target == 'mariadb':
-            target_script = f'bigint {number_type_attribute} auto_increment'
-    else:
-        if product_target == 'mysql':
-            target_script = f'bigint {number_type_attribute}'
-        elif product_target == 'postgresql':
+        else:
             target_script = f'int8'
-        elif product_target == 'mariadb':
-            target_script = f'bigint {number_type_attribute}'
+    elif product_target == 'mariadb':
+        target_script = f'bigint'
     return target_script
 
 def float(product_target: str, metadata_dict: dict[str: str]) -> str:
@@ -158,8 +153,8 @@ def numeric(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    numeric_precision = metadata_dict[numeric_precision]
-    numeric_scale= metadata_dict[numeric_scale]
+    numeric_precision = metadata_dict['numeric_precision']
+    numeric_scale= metadata_dict['numeric_scale']
     if product_target == 'mysql':
         target_script = f'numeric({numeric_precision, numeric_scale})'
     elif product_target == 'postgresql':
@@ -179,9 +174,9 @@ def char(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    char_max_length = metadata_dict[char_max_length]
-    char_set = metadata_dict[char_set]
-    char_collation = metadata_dict[char_collation]
+    char_max_length = metadata_dict['char_max_length']
+    char_set = metadata_dict['char_set']
+    char_collation = metadata_dict['char_collation']
     if product_target == 'mysql':
         target_script = f'char({char_max_length}) set {char_set} collation {char_collation}'
     elif product_target == 'postgresql':
@@ -201,9 +196,9 @@ def varchar(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    char_max_length = metadata_dict[char_max_length]
-    char_set = metadata_dict[char_set]
-    char_collation = metadata_dict[char_collation]
+    char_max_length = metadata_dict['char_max_length']
+    char_set = metadata_dict['char_set']
+    char_collation = metadata_dict['char_collation']
     if product_target == 'mysql':
         target_script = f'varchar({char_max_length}) set {char_set} collation {char_collation}'
     elif product_target == 'postgresql':
@@ -223,9 +218,9 @@ def tinytext(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    char_max_length = metadata_dict[char_max_length]
-    char_set = metadata_dict[char_set]
-    char_collation = metadata_dict[char_collation]
+    char_max_length = metadata_dict['char_max_length']
+    char_set = metadata_dict['char_set']
+    char_collation = metadata_dict['char_collation']
     if product_target == 'mysql':
         target_script = f'tinytext({char_max_length}) set {char_set} collation {char_collation}'
     elif product_target == 'postgresql':
@@ -245,9 +240,9 @@ def text(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    char_max_length = metadata_dict[char_max_length]
-    char_set = metadata_dict[char_set]
-    char_collation = metadata_dict[char_collation]
+    char_max_length = metadata_dict['char_max_length']
+    char_set = metadata_dict['char_set']
+    char_collation = metadata_dict['char_collation']
     if product_target == 'mysql':
         target_script = f'text({char_max_length}) set {char_set} collation {char_collation}'
     elif product_target == 'postgresql':
@@ -267,9 +262,9 @@ def mediumtext(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    char_max_length = metadata_dict[char_max_length]
-    char_set = metadata_dict[char_set]
-    char_collation = metadata_dict[char_collation]
+    char_max_length = metadata_dict['char_max_length']
+    char_set = metadata_dict['char_set']
+    char_collation = metadata_dict['char_collation']
     if product_target == 'mysql':
         target_script = f'mediumtext({char_max_length}) set {char_set} collation {char_collation}'
     elif product_target == 'postgresql':
@@ -289,9 +284,9 @@ def longtext(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    char_max_length = metadata_dict[char_max_length]
-    char_set = metadata_dict[char_set]
-    char_collation = metadata_dict[char_collation]
+    char_max_length = metadata_dict['char_max_length']
+    char_set = metadata_dict['char_set']
+    char_collation = metadata_dict['char_collation']
     if product_target == 'mysql':
         target_script = f'longtext({char_max_length}) set {char_set} collation {char_collation}'
     elif product_target == 'postgresql':
@@ -311,9 +306,7 @@ def binary(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    char_max_size = metadata_dict[char_max_size]
-    char_set = metadata_dict[char_set]
-    char_collation = metadata_dict[char_collation]
+    char_max_size = metadata_dict['char_max_size']
     if product_target == 'mysql':
         target_script = f'binary({char_max_size})'
     elif product_target == 'postgresql':
@@ -333,9 +326,7 @@ def varbinary(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    char_max_size = metadata_dict[char_max_size]
-    char_set = metadata_dict[char_set]
-    char_collation = metadata_dict[char_collation]
+    char_max_size = metadata_dict['char_max_size']
     if product_target == 'mysql':
         target_script = f'varbinary({char_max_size})'
     elif product_target == 'postgresql':
@@ -355,7 +346,6 @@ def tinyblob(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    char_max_size = metadata_dict[char_max_size]
     if product_target == 'mysql':
         target_script = f'tinyblob'
     elif product_target == 'postgresql':
@@ -375,7 +365,7 @@ def blob(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    char_max_size = metadata_dict[char_max_size]
+    char_max_size = metadata_dict['char_max_size']
     if product_target == 'mysql':
         target_script = f'blob({char_max_size})'
     elif product_target == 'postgresql':
@@ -395,7 +385,6 @@ def mediumblob(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    char_max_size = metadata_dict[char_max_size]
     if product_target == 'mysql':
         target_script = f'mediumblob'
     elif product_target == 'postgresql':
@@ -415,7 +404,6 @@ def longblob(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    char_max_size = metadata_dict[char_max_size]
     if product_target == 'mysql':
         target_script = f'longblob'
     elif product_target == 'postgresql':
@@ -473,7 +461,7 @@ def time(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    time_precision = metadata_dict[time_precision]
+    time_precision = metadata_dict['time_precision']
     if time_precision is not None:
         time_precision = f'({time_precision})'
     else:
@@ -497,23 +485,17 @@ def datetime(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    from re import match
-    time_precision = metadata_dict[time_precision]
-    extra = metadata_dict[extra]
+    time_precision = metadata_dict['time_precision']
     if time_precision is not None:
         time_precision = f'({time_precision})'
     else:
         time_precision = ''
-    if match(".*on update CURRENT_TIMESTAMP.*", extra):
-        extra = " on update CURRENT_TIMESTAMP"
-    else:
-        extra = ""
     if product_target == 'mysql':
-        target_script = f'datetime{time_precision}{extra}'
+        target_script = f'datetime{time_precision}'
     elif product_target == 'postgresql':
         target_script = f'timestamp{time_precision}'
     elif product_target == 'mariadb':
-        target_script = f'datetime{time_precision}{extra}'
+        target_script = f'datetime{time_precision}'
     return target_script
 
 def timestamp(product_target: str, metadata_dict: dict[str: str]) -> str:
@@ -527,23 +509,17 @@ def timestamp(product_target: str, metadata_dict: dict[str: str]) -> str:
     Returns:
         target_script(string): string for the column ddl
     """
-    from re import match
-    time_precision = metadata_dict[time_precision]
-    extra = metadata_dict[extra]
+    time_precision = metadata_dict['time_precision']
     if time_precision is not None:
         time_precision = f'({time_precision})'
     else:
         time_precision = ''
-    if match(".*on update CURRENT_TIMESTAMP.*", extra):
-        extra = " on update CURRENT_TIMESTAMP"
-    else:
-        extra = ""
     if product_target == 'mysql':
-        target_script = f'timestamp{time_precision}{extra}'
+        target_script = f'timestamp{time_precision}'
     elif product_target == 'postgresql':
         target_script = f'timestamp{time_precision}'
     elif product_target == 'mariadb':
-        target_script = f'timestamp{time_precision}{extra}'
+        target_script = f'timestamp{time_precision}'
     return target_script
 
 def json(product_target: str, metadata_dict: dict[str: str]) -> str:
