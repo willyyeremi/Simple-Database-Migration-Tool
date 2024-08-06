@@ -49,7 +49,7 @@ def all_schema(connection: object) -> list[str]:
     from sqlalchemy.sql import text
     script = f"""
         SELECT 
-            schema_name
+            schema_name schema_name
         FROM 
             information_schema.schemata
         WHERE 
@@ -90,9 +90,9 @@ def all_table(connection:object, schema:str) -> DataFrame:
 def column_rule(connection:object, schema:str) -> DataFrame:
     """
     Get all primary key in a schema. The dataframe columns description are:
-    - table_name(string): name of all tables inside the schema 
-    - column_name(string): name of all columns that selected as primary key
-    - ordinal_position(string): the position of column on table
+    - table_name(string): name of the table
+    - column_name(string): name of the column
+    - ordinal_position(string): the position of column on table from left
     - is_nullable(string): 'NULL' if column can have null, 'NOT NULL' if can not
     - column_comment(string): column comment
     - default_value(string): the default value expression

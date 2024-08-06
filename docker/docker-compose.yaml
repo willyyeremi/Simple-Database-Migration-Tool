@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  postgresql:
+    image: postgres:latest
+    container_name: test_postgresql
+    environment:
+      POSTGRES_DB: test_data
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database/data/postgresql:/var/lib/postgresql/data
+      - ./database/etc/postgresql/initial.sql:/docker-entrypoint-initdb.d/initial.sql:ro
+
+  mysql:
+    image: mysql:latest
+    container_name: test_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: test_data
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./database/data/mysql:/var/lib/mysql
+      - ./database/etc/mysql/initial.sql:/docker-entrypoint-initdb.d/initial.sql:ro
+
+  oracledb:
+    image: oracledb:latest
+    container_name: test_oracledb
+    environment:
+      ORACLE_PWD: admin
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    volumes:
+      - ./database/data/oracledb:/opt/oracle/oradata
+      - ./database/etc/oracledb/initial.sql:/docker-entrypoint-initdb.d/setup/initial.sql
