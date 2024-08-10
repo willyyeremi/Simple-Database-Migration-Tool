@@ -1,4 +1,4 @@
-from .mysql import *
+from .mysql.mysql.mysql import *
 from .mariadb import *
 from .oracle import *
 from .postgresql import *
